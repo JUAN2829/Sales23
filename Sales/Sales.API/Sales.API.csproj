@@ -20,8 +20,4 @@
     <ProjectReference Include="..\Sales.Share\Sales.Share.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
 </Project>
