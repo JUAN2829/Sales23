@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Sales.Share.Entities;
+using Sales.Shared.Entities;
 
 namespace Sales.API.Data
 {
@@ -8,7 +9,12 @@ namespace Sales.API.Data
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
         }
+        public DbSet<City> Cities { get; set; }
+
         public DbSet<Country> Countries { get; set; }
+
+        public DbSet<State> States { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -19,8 +19,20 @@ namespace Sales.API.Controllers
         [HttpGet]
         public async Task<ActionResult> GetAsync()
         {
-            return Ok(await _context.Countries.ToListAsync());
+            return Ok(await _context.Countries
+                .Include(x => x.States)
+                .ToListAsync());
         }
+
+        [HttpGet("full")]
+        public async Task<ActionResult> GetFull()
+        {
+            return Ok(await _context.Countries
+                .Include(x => x.States!)
+                .ThenInclude(x => x.Cities)
+                .ToListAsync());
+        }
+
 
         [HttpPost]
         public async Task<ActionResult> PostAsync(Country country)
@@ -51,7 +63,10 @@ namespace Sales.API.Controllers
         [HttpGet("{id:int}")]
         public async Task<ActionResult> Get(int id)
         {
-            var country = await _context.Countries.FirstOrDefaultAsync(x => x.Id == id);
+            var country = await _context.Countries
+                .Include(x => x.States)
+                .ThenInclude(x => x.Cities)
+                .FirstOrDefaultAsync(x => x.Id == id);
             if (country is null)
             {
                 return NotFound();
