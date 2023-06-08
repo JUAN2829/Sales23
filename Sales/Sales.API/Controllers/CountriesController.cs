@@ -104,6 +104,13 @@ namespace Sales.API.Controllers
 
             return Ok(country);
         }
+// combo para listar paises 
+        [AllowAnonymous]
+        [HttpGet("combo")]
+        public async Task<ActionResult> GetCombo()
+        {
+            return Ok(await _context.Countries.ToListAsync());
+        }
 
         [HttpPut]
         public async Task<ActionResult> Put(Country country)
