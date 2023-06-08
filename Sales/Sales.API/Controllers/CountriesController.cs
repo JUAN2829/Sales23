@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Sales.API.Data;
 using Sales.API.Helpers;
@@ -8,6 +10,7 @@ using Sales.Shared.DTOs;
 namespace Sales.API.Controllers
 {
     [ApiController]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("/api/countries")]
     public class CountriesController : ControllerBase
     {
@@ -90,8 +93,8 @@ namespace Sales.API.Controllers
         [HttpGet("{id:int}")]
         public async Task<ActionResult> Get(int id)
         {
-            var country = await _context.Countries
-                .Include(x => x.States)
+            var country = await _context!.Countries
+                .Include(x => x.States!)
                 .ThenInclude(x => x.Cities)
                 .FirstOrDefaultAsync(x => x.Id == id);
             if (country is null)
