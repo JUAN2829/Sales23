@@ -14,7 +14,7 @@ namespace Sales.API.Controllers
     public class AccountsController : ControllerBase
     {
         private readonly IUserHelper _userHelper;
-        private readonly IConfiguration _configuration;
+
         private readonly IFileStorage _fileStorage;
         private readonly string _container;
 
@@ -25,6 +25,13 @@ namespace Sales.API.Controllers
             _configuration = configuration;
             _fileStorage = fileStorage;
             _container = "users";
+
+
+
+        public AccountsController(IUserHelper userHelper, IConfiguration configuration)
+        {
+            _userHelper = userHelper;
+            _configuration = configuration;
 
         }
 
