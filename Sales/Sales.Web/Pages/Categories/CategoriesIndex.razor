@@ -12,54 +12,54 @@ else
 {
     <GenericList MyList="categories">
         <Body>
-        <RecordsComplete>
-            <div class="card">
-                <div class="card-header">
-                    <span>
-                        <i class="oi oi-list"></i> Castegorías
-                        <a class="btn btn-sm btn-primary float-end" href="/categories/create"><i class="oi oi-plus"></i> Adicionar Categoría</a>
-                    </span>
-                </div>
-                <div class="card-body">
-                    <div class="mb-2" style="display: flex; flex-wrap:wrap; align-items: center;">
-                        <div>
-                            <input style="width: 400px;" type="text" class="form-control" id="titulo" placeholder="Buscar categoría..." @bind-value="Filter" />
-                        </div>
-                        <div class="mx-1">
-                            <button type="button" class="btn btn-outline-primary" @onclick="ApplyFilterAsync"><i class="oi oi-layers" /> Filtrar</button>
-                            <button type="button" class="btn btn-outline-danger" @onclick="CleanFilterAsync"><i class="oi oi-ban" /> Limpiar</button>
-                        </div>
+            <RecordsComplete>
+                <div class="card">
+                    <div class="card-header">
+                        <span>
+                            <i class="oi oi-list"></i> Castegorías
+                            <a class="btn btn-sm btn-primary float-end" @onclick=@(() => ShowModal())><i class="oi oi-plus"></i> Adicionar Categoría</a>
+                        </span>
                     </div>
+                    <div class="card-body">
+                        <div class="mb-2" style="display: flex; flex-wrap:wrap; align-items: center;">
+                            <div>
+                                <input style="width: 400px;" type="text" class="form-control" id="titulo" placeholder="Buscar categoría..." @bind-value="Filter" />
+                            </div>
+                            <div class="mx-1">
+                                <button type="button" class="btn btn-sm btn-outline-primary" @onclick="ApplyFilterAsync"><i class="oi oi-layers" /> Filtrar</button>
+                                <button type="button" class="btn btn-sm btn-outline-danger" @onclick="CleanFilterAsync"><i class="oi oi-ban" /> Limpiar</button>
+                            </div>
+                        </div>
 
-                    <Pagination CurrentPage="currentPage"
-                            TotalPages="totalPages"
-                            SelectedPage="SelectedPageAsync" />
+                        <Pagination CurrentPage="currentPage"
+                                    TotalPages="totalPages"
+                                    SelectedPage="SelectedPageAsync" />
 
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Categoría</th>
-                                <th style="width:200px"></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var category in categories)
-                            {
+                        <table class="table table-striped table-sm">
+                            <thead>
                                 <tr>
-                                    <td>
-                                        @category.Name
-                                    </td>
-                                    <td>
-                                        <a href="/categories/edit/@category.Id" class="btn btn-warning"><i class="oi oi-pencil" /> Editar</a>
-                                        <button class="btn btn-danger" @onclick=@(() => Delete(category.Id))><i class="oi oi-trash" /> Borrar</button>
-                                    </td>
+                                    <th>Categoría</th>
+                                    <th style="width:200px"></th>
                                 </tr>
-                            }
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                @foreach (var category in categories)
+                                {
+                                    <tr>
+                                        <td>
+                                            @category.Name
+                                        </td>
+                                        <td>
+                                            <a @onclick=@(() => ShowModal(category.Id, true)) class="btn btn-sm btn-warning"><i class="oi oi-pencil" /> Editar</a>
+                                            <button class="btn btn-sm btn-danger" @onclick=@(() => Delete(category.Id))><i class="oi oi-trash" /> Borrar</button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
-        </RecordsComplete>
+            </RecordsComplete>
         </Body>
     </GenericList>
 }
@@ -69,6 +69,9 @@ else
     private int currentPage = 1;
     private int totalPages;
 
+    [CascadingParameter]
+    IModalService Modal { get; set; } = default!;
+
     [Parameter]
     [SupplyParameterFromQuery]
     public string Page { get; set; } = "";
@@ -76,6 +79,29 @@ else
     [Parameter]
     [SupplyParameterFromQuery]
     public string Filter { get; set; } = "";
+
+
+
+    private async Task ShowModal(int id = 0, bool isEdit = false)
+    {
+        IModalReference modalReference;
+
+        if (isEdit)
+        {
+            modalReference = Modal.Show<CategoryEdit>(string.Empty, new ModalParameters().Add("CategoryId", id));
+        }
+        else
+        {
+            modalReference = Modal.Show<CategoryCreate>();
+        }
+
+        var result = await modalReference.Result;
+        if (result.Confirmed)
+        {
+            await LoadAsync();
+        }
+    }
+
 
     protected async override Task OnInitializedAsync()
     {

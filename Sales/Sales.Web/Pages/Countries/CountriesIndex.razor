@@ -18,7 +18,7 @@ else
                 <div class="card-header">
                     <span>
                         <i class="oi oi-globe"></i> Países
-                        <a class="btn btn-sm btn-primary float-end" href="/countries/create"><i class="oi oi-plus"></i> Adicionar País</a>
+                        <a class="btn btn-sm btn-primary float-end" @onclick=@(() => ShowModal())><i class="oi oi-plus"></i> Adicionar País</a>
                     </span>
                 </div>
                 <div class="card-body">
@@ -36,7 +36,7 @@ else
                                 TotalPages="totalPages"
                                 SelectedPage="SelectedPage" />
                 </div>
-                <table class="table table-striped">
+                <table class="table table-striped table-sm">
                     <thead>
                         <tr>
                             <th>País</th>
@@ -57,7 +57,7 @@ else
 
                                 <td>
                                     <a href="/countries/details/@country.Id" class="btn btn-info btn-sm"><i class="oi oi-list" /> Detalles</a>
-                                    <a href="/countries/edit/@country.Id" class="btn btn-warning btn-sm"><i class="oi oi-pencil" /> Editar</a>
+                                    <a @onclick=@(() => ShowModal(country.Id, true)) class="btn btn-warning btn-sm"><i class="oi oi-pencil" /> Editar</a>
                                     <button class="btn btn-danger btn-sm" @onclick=@(() => DeleteAsync(country))><i class="oi oi-trash" /> Borrar</button>
 
                                 </td>
@@ -75,6 +75,9 @@ else
     public List<Country>? Countries { get; set; }
     private int currentPage = 1;
     private int totalPages;
+
+    [CascadingParameter]
+    IModalService Modal { get; set; } = default!;
 
     [Parameter]
     [SupplyParameterFromQuery]
@@ -97,6 +100,26 @@ else
     {
         currentPage = page;
         await LoadAsync(page);
+    }
+
+    private async Task ShowModal(int id = 0, bool isEdit = false)
+    {
+        IModalReference modalReference;
+
+        if (isEdit)
+        {
+            modalReference = Modal.Show<CountryEdit>(string.Empty, new ModalParameters().Add("CountryId", id));
+        }
+        else
+        {
+            modalReference = Modal.Show<CountryCreate>();
+        }
+
+        var result = await modalReference.Result;
+        if (result.Confirmed)
+        {
+            await LoadAsync();
+        }
     }
 
 
