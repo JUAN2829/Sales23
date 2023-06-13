@@ -69,11 +69,13 @@
     </div>
 </EditForm>
 
-@*@if (IsEdit && ProductDTO.ProductImages is not null)
-{
-    <CarouselView Images="ProductDTO.ProductImages" />
-}*@
 
+
+@*@if (IsEdit && Images is not null)
+{
+    <CarouselView Images="Images" />
+}
+*@
 @code {
     private EditContext editContext = null!;
     private List<MultipleSelectorModel> selected { get; set; } = new();
